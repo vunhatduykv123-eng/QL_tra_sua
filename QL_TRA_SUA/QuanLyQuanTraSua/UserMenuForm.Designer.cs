@@ -37,13 +37,14 @@
             this.dgvUserMenu.AllowUserToAddRows = false;
             this.dgvUserMenu.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvUserMenu.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvUserMenu.Location = new System.Drawing.Point(-4, -1);
+            this.dgvUserMenu.Location = new System.Drawing.Point(-4, 3);
             this.dgvUserMenu.Name = "dgvUserMenu";
             this.dgvUserMenu.ReadOnly = true;
             this.dgvUserMenu.RowHeadersWidth = 51;
             this.dgvUserMenu.RowTemplate.Height = 24;
             this.dgvUserMenu.Size = new System.Drawing.Size(810, 448);
             this.dgvUserMenu.TabIndex = 0;
+            this.dgvUserMenu.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvUserMenu_CellContentClick);
             // 
             // UserMenuForm
             // 

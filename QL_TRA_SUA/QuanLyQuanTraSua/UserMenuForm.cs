@@ -7,34 +7,44 @@ namespace QuanLyQuanTraSua
 {
     public partial class UserMenuForm : Form
     {
-        // Duy dùng chung chuỗi kết nối này nhé
-        string connStr = @"Data Source=LAPTOP-I6EBBTME;Initial Catalog=QuanLyTraSua;Integrated Security=True";
+        private SqlConnection conn;
+        private SqlDataAdapter adapter;
+        private DataSet dSetExam;
+        private string sqlstr;
 
         public UserMenuForm()
         {
             InitializeComponent();
         }
 
-        // Hàm này giúp khách hàng thấy danh sách món ngay khi mở app
         private void UserMenuForm_Load(object sender, EventArgs e)
         {
-            using (SqlConnection conn = new SqlConnection(connStr))
+            try
             {
-                try
-                {
-                    conn.Open();
-                    // Chỉ lấy Tên và Giá cho khách xem thôi, không cần lấy Mã
-                    string sql = "SELECT TenMon AS [Tên Trà Sữa], Gia AS [Giá Tiền] FROM MonChinh";
-                    SqlDataAdapter da = new SqlDataAdapter(sql, conn);
-                    DataTable dt = new DataTable();
-                    da.Fill(dt);
-                    dgvUserMenu.DataSource = dt; // Đài nhớ đặt tên DataGridView là dgvUserMenu nhé
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi hiển thị Menu: " + ex.Message);
-                }
+                conn = new SqlConnection("Server=LAPTOP-I6EBBTME;Initial Catalog=QLQTraSua;User Id=sa;pwd=Duy200666.;");
+                conn.Open();
+
+                sqlstr = "SELECT TenMon AS [Tên Trà Sữa], Gia AS [Giá Tiền] FROM MonChinh";
+
+                adapter = new SqlDataAdapter(sqlstr, conn);
+                dSetExam = new DataSet("ExamResults");
+                adapter.Fill(dSetExam, "ExamResults");
+
+                dgvUserMenu.DataSource = dSetExam.Tables[0];
             }
+            catch (Exception excep)
+            {
+                MessageBox.Show(excep.Message);
+            }
+            finally
+            {
+                if (conn != null) conn.Close();
+            }
+        }
+
+        private void dgvUserMenu_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

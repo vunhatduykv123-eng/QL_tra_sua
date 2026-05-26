@@ -28,7 +28,6 @@ D:\QL_TRA_SUA\QuanLyQuanTraSua\bin\Debug\QuanLyQuanTraSua.exe.config
 D:\QL_TRA_SUA\QuanLyQuanTraSua\bin\Debug\QuanLyQuanTraSua.exe
 D:\QL_TRA_SUA\QuanLyQuanTraSua\bin\Debug\QuanLyQuanTraSua.pdb
 D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.csproj.AssemblyReference.cache
-D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.exe.config
 D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.AdminForm.resources
 D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.Form1.resources
 D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.FormRegister.resources
@@ -38,3 +37,4 @@ D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.csproj.GenerateResourc
 D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.csproj.CoreCompileInputs.cache
 D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.exe
 D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.pdb
+D:\QL_TRA_SUA\QuanLyQuanTraSua\obj\Debug\QuanLyQuanTraSua.exe.config

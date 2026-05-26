@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.txtUser = new System.Windows.Forms.TextBox();
-            this.txtPass = new System.Windows.Forms.TextBox();
+            this.txtUsername = new System.Windows.Forms.TextBox();
+            this.txtPassword = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -46,19 +46,19 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "ĐĂNG NHẬP HỆ THỐNG";
             // 
-            // txtUser
+            // txtUsername
             // 
-            this.txtUser.Location = new System.Drawing.Point(328, 168);
-            this.txtUser.Name = "txtUser";
-            this.txtUser.Size = new System.Drawing.Size(127, 22);
-            this.txtUser.TabIndex = 1;
+            this.txtUsername.Location = new System.Drawing.Point(328, 168);
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(127, 22);
+            this.txtUsername.TabIndex = 1;
             // 
-            // txtPass
+            // txtPassword
             // 
-            this.txtPass.Location = new System.Drawing.Point(328, 209);
-            this.txtPass.Name = "txtPass";
-            this.txtPass.Size = new System.Drawing.Size(127, 22);
-            this.txtPass.TabIndex = 2;
+            this.txtPassword.Location = new System.Drawing.Point(328, 209);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.Size = new System.Drawing.Size(127, 22);
+            this.txtPassword.TabIndex = 2;
             // 
             // button1
             // 
@@ -78,7 +78,6 @@
             this.label2.Size = new System.Drawing.Size(98, 16);
             this.label2.TabIndex = 4;
             this.label2.Text = "Tên đăng nhập";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // label3
             // 
@@ -97,7 +96,7 @@
             this.button2.TabIndex = 6;
             this.button2.Text = "Đăng ký";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.btnRegister_Click);
+            this.button2.Click += new System.EventHandler(this.btnGoToRegister_Click);
             // 
             // Form1
             // 
@@ -110,11 +109,12 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.txtPass);
-            this.Controls.Add(this.txtUser);
+            this.Controls.Add(this.txtPassword);
+            this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.label1);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -123,8 +123,8 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtUser;
-        private System.Windows.Forms.TextBox txtPass;
+        private System.Windows.Forms.TextBox txtUsername;
+        private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

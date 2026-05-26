@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace QuanLyQuanTraSua
 {
-    public partial class Form1 : Form
+    /*Tạo ra một lớp giao diện công khai tên là Form1, lớp này được chia làm
+    nhiều file cấu phần (partial) và được kế thừa (:)
+    toàn bộ tính năng của một cái cửa sổ Windows tiêu chuẩn (Form)"*/
+    public partial class Form1 : Form  
     {
-        // Chuỗi kết nối đến Database QuanLyTraSua
-        string connStr = @"Data Source=LAPTOP-I6EBBTME;Initial Catalog=QuanLyTraSua;Integrated Security=True";
-
         public Form1()
         {
             InitializeComponent();
@@ -16,64 +17,79 @@ namespace QuanLyQuanTraSua
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            using (SqlConnection conn = new SqlConnection(connStr))
+            bool OK = false;
+            string vaiTro = ""; // Biến dùng để hứng chữ 'admin' hoặc 'khach' từ SQL Server lên
+
+            SqlConnection conn = new SqlConnection("Data Source=LAPTOP-I6EBBTME;Initial Catalog=QLQTraSua;User ID=sa;Password=Duy200666.");
+            SqlDataReader rdr = null;
+
+            try
             {
-                try
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("select * from Nguoidung", conn);
+                rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
                 {
-                    conn.Open();
-                    string user = txtUser.Text.Trim();
-                    string pass = txtPass.Text.Trim();
-
-                    // Lấy cột 'role' từ database dựa trên tài khoản/mật khẩu
-                    string sql = "SELECT role FROM users WHERE username=@user AND password=@pass";
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@user", user);
-                    cmd.Parameters.AddWithValue("@pass", pass);
-
-                    object result = cmd.ExecuteScalar();
-
-                    if (result != null)
+                    // Kiểm tra trùng khớp Tài khoản và Mật khẩu
+                    if ((txtUsername.Text.Trim() == rdr["Tendangnhap"].ToString().Trim()) &&
+                        (txtPassword.Text.Trim() == rdr["Matkhau"].ToString().Trim()))
                     {
-                        string role = result.ToString().Trim().ToLower();
-                        MessageBox.Show("Đăng nhập thành công!", "Thông báo");
-
-                        this.Hide(); // Ẩn Form đăng nhập
-
-                        // ĐIỀU HƯỚNG DỰA TRÊN QUYỀN
-                        if (role == "admin")
-                        {
-                            // Nếu là Admin thì mở trang Quản lý của Duy và Đài
-                            AdminForm fAdmin = new AdminForm();
-                            fAdmin.ShowDialog();
-                        }
-                        else
-                        {
-                            // Nếu là User/Nhân viên thì mở trang Menu xem món vừa tạo
-                            UserMenuForm fUser = new UserMenuForm();
-                            fUser.ShowDialog();
-                        }
-
-                        this.Show(); // Hiện lại Form đăng nhập sau khi đóng các Form kia
-                    }
-                    else
-                    {
-                        MessageBox.Show("Tài khoản hoặc mật khẩu không chính xác!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        OK = true;
+                        // Lấy giá trị của cột Quyen dưới SQL gán vào biến vaiTro (ép về chữ thường để tránh gõ hoa thường)
+                        vaiTro = rdr["Quyen"].ToString().Trim().ToLower();
+                        break;
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Lỗi kết nối CSDL!");
+                return;
+            }
+            finally
+            {
+                if (rdr != null) rdr.Close();
+                if (conn != null) conn.Close();
+            }
+
+            if (OK == false)
+            {
+                MessageBox.Show("Tên đăng nhập/Mật khẩu không hợp lệ!");
+            }
+            else
+            {
+                MessageBox.Show("Đăng nhập thành công!");
+
+                // --- ĐOẠN PHÂN QUYỀN THEO CÁCH 2 CỦA THẦY ---
+                if (vaiTro == "admin")
                 {
-                    MessageBox.Show("Lỗi kết nối: " + ex.Message);
+                    // Nếu cột Quyen dưới CSDL ghi là 'admin' -> Vào AdminForm
+                    AdminForm frmAdmin = new AdminForm();
+                    this.Hide();
+                    frmAdmin.ShowDialog();
+                    this.Show();
+                }
+                else
+                {
+                    // Nếu cột Quyen dưới CSDL ghi là 'khach' (hoặc bất kỳ chữ nào khác) -> Vào UserMenuForm
+                    UserMenuForm frmUser = new UserMenuForm();
+                    this.Hide();
+                    frmUser.ShowDialog();
+                    this.Show();
                 }
             }
         }
 
-        private void btnRegister_Click(object sender, EventArgs e)
+        private void btnGoToRegister_Click(object sender, EventArgs e)
         {
-            FormRegister f = new FormRegister();
-            f.ShowDialog();
+            FormRegister frmRegister = new FormRegister();
+            this.Hide();
+            frmRegister.ShowDialog();
+            this.Show();
         }
 
-        private void label2_Click(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
 
         }

@@ -7,8 +7,13 @@ namespace QuanLyQuanTraSua
 {
     public partial class AdminForm : Form
     {
-        int maChon = -1;
-        string connStr = @"Data Source=LAPTOP-I6EBBTME;Initial Catalog=QuanLyTraSua;Integrated Security=True";
+        private SqlConnection conn;
+        private SqlDataAdapter adapter;
+        private DataSet dSetExam;
+        private string sqlstr;
+
+        // BIẾN THẦY DẠY: Tạo một biến toàn cục để lưu lại Mã món đang được chọn
+        private int maDangChon = -1;
 
         public AdminForm()
         {
@@ -17,22 +22,18 @@ namespace QuanLyQuanTraSua
 
         public void LoadData()
         {
-            using (SqlConnection conn = new SqlConnection(connStr))
+            try
             {
-                try
-                {
-                    conn.Open();
-                    // Lưu ý: Tên cột hiển thị là [Mã], [Tên Món], [Giá Tiền]
-                    string sql = "SELECT MaMon AS [Mã], TenMon AS [Tên Món], Gia AS [Giá Tiền] FROM MonChinh";
-                    SqlDataAdapter da = new SqlDataAdapter(sql, conn);
-                    DataTable dt = new DataTable();
-                    da.Fill(dt);
-                    dgvMenu.DataSource = dt;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi tải danh sách: " + ex.Message);
-                }
+                conn = new SqlConnection("Data Source=LAPTOP-I6EBBTME;Initial Catalog=QLQTraSua;User ID=sa;Password=Duy200666.");
+                sqlstr = "SELECT MaMon AS [Mã], TenMon AS [Tên Món Trà Sữa], Gia AS [Giá Tiền] FROM MonChinh";
+                adapter = new SqlDataAdapter(sqlstr, conn);
+                dSetExam = new DataSet("TSResults");
+                adapter.Fill(dSetExam, "TSResults");
+                dgvMenu.DataSource = dSetExam.Tables[0];
+            }
+            catch (Exception excep)
+            {
+                MessageBox.Show(excep.Message);
             }
         }
 
@@ -41,132 +42,115 @@ namespace QuanLyQuanTraSua
             LoadData();
         }
 
-        private void btnAdd_Click(object sender, EventArgs e)
+        // Sự kiện click dòng trên bảng để lấy dữ liệu
+        private void dgvMenu_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (string.IsNullOrEmpty(txtTenMon.Text) || string.IsNullOrEmpty(txtGia.Text))
-            {
-                MessageBox.Show("Vui lòng nhập đầy đủ tên món và giá!");
-                return;
-            }
-
-            using (SqlConnection conn = new SqlConnection(connStr))
-            {
-                try
-                {
-                    conn.Open();
-                    string sql = "INSERT INTO MonChinh (TenMon, Gia) VALUES (@ten, @gia)";
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@ten", txtTenMon.Text.Trim());
-                    cmd.Parameters.AddWithValue("@gia", txtGia.Text.Trim());
-
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Đã thêm món mới thành công!");
-                    LoadData();
-
-                    txtTenMon.Clear();
-                    txtGia.Clear();
-                    txtTenMon.Focus();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi khi thêm: " + ex.Message);
-                }
-            }
-        }
-
-        // Cập nhật logic xử lý khi chọn dòng trong bảng
-        private void dgvMenu_CellClick_1(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && !dgvMenu.Rows[e.RowIndex].IsNewRow)
+            if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dgvMenu.Rows[e.RowIndex];
-
                 if (row.Cells["Mã"].Value != DBNull.Value)
                 {
-                    maChon = Convert.ToInt32(row.Cells["Mã"].Value);
-                    txtTenMon.Text = row.Cells["Tên Món"].Value.ToString();
+                    // Khóa chặt mã số món trà sữa vào biến toàn cục
+                    maDangChon = Convert.ToInt32(row.Cells["Mã"].Value);
 
-                    // Sửa lỗi: đổi "Giá" thành "Giá Tiền" cho khớp với LoadData
+                    txtTenMon.Text = row.Cells["Tên Món Trà Sữa"].Value.ToString();
                     txtGia.Text = row.Cells["Giá Tiền"].Value.ToString();
                 }
             }
         }
 
+        // Nhấn nút Update - Sửa dữ liệu dựa theo Mã món (Chuẩn xác 100% không lo bị nhảy lại tên cũ)
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            if (maChon == -1)
+            if (maDangChon == -1)
             {
-                MessageBox.Show("Vui lòng chọn một món trong bảng trước khi bấm Sửa!");
+                MessageBox.Show("Vui lòng click chọn một món trà sữa trong bảng trước khi sửa!");
                 return;
             }
 
-            using (SqlConnection conn = new SqlConnection(connStr))
+            try
             {
-                try
-                {
-                    conn.Open();
-                    string sql = "UPDATE MonChinh SET TenMon=@ten, Gia=@gia WHERE MaMon=@id";
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@ten", txtTenMon.Text.Trim());
-                    cmd.Parameters.AddWithValue("@gia", txtGia.Text.Trim());
-                    cmd.Parameters.AddWithValue("@id", maChon);
+                conn = new SqlConnection("Data Source=LAPTOP-I6EBBTME;Initial Catalog=QLQTraSua;User ID=sa;Password=Duy200666.");
+                conn.Open();
 
-                    // Đoạn code mới để kiểm tra xem có sửa được dòng nào không:
-                    int rowsAffected = cmd.ExecuteNonQuery();
+                string tenMoi = txtTenMon.Text.Trim();
+                string giaMoi = txtGia.Text.Trim();
 
-                    if (rowsAffected > 0)
-                    {
-                        MessageBox.Show("Đã sửa thành công " + rowsAffected + " món!");
-                        LoadData(); // Cập nhật lại bảng
-                    }
-                    else
-                    {
-                        MessageBox.Show("Mã món là: " + maChon + ". Cập nhật chạy xong nhưng không có món nào bị đổi!");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi sửa món: " + ex.Message);
-                }
+                // CẤU TRÚC CHUẨN CỦA THẦY: Update dựa theo khóa chính MaMon
+                string sql = "UPDATE MonChinh SET TenMon=N'" + tenMoi + "', Gia=" + giaMoi + " WHERE MaMon=" + maDangChon;
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+
+                MessageBox.Show("Updated");
+                conn.Close();
+
+                maDangChon = -1; // Reset lại biến chọn
+                txtTenMon.Clear();
+                txtGia.Clear();
+                LoadData(); // Nạp lại bảng dữ liệu thật từ SQL Server
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi cập nhật: " + ex.Message);
             }
         }
-        // Logic cho nút XÓA MÓN
-        private void button2_Click(object sender, EventArgs e)
+
+        // Nhấn nút Add - Thêm món mới 
+        private void btnAdd_Click(object sender, EventArgs e)
         {
-            if (maChon == -1)
+            if (string.IsNullOrEmpty(txtTenMon.Text.Trim()) || string.IsNullOrEmpty(txtGia.Text.Trim()))
             {
-                MessageBox.Show("Vui lòng chọn món cần xóa trong danh sách!");
+                MessageBox.Show("Vui lòng nhập đầy đủ Tên món và Giá tiền trước khi bấm Thêm!");
                 return;
             }
 
-            DialogResult dr = MessageBox.Show("Bạn có chắc chắn muốn xóa món này không?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            conn = new SqlConnection("Data Source=LAPTOP-I6EBBTME;Initial Catalog=QLQTraSua;User ID=sa;Password=Duy200666.");
+            conn.Open();
 
-            if (dr == DialogResult.Yes)
+            string name = txtTenMon.Text;
+            string price = txtGia.Text;
+
+            string sql = "INSERT into MonChinh values(N'" + name + "', " + price + ")";
+
+            SqlCommand cmd = new SqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
+
+            MessageBox.Show("Added");
+            conn.Close();
+            LoadData();
+        }
+
+        // Nhấn nút Delete - Xóa món theo Mã món được chọn
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (maDangChon == -1)
             {
-                using (SqlConnection conn = new SqlConnection(connStr))
-                {
-                    try
-                    {
-                        conn.Open();
-                        string sql = "DELETE FROM MonChinh WHERE MaMon=@id";
-                        SqlCommand cmd = new SqlCommand(sql, conn);
-                        cmd.Parameters.AddWithValue("@id", maChon);
-
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Đã xóa món thành công!");
-
-                        // Reset lại trạng thái sau khi xóa
-                        maChon = -1;
-                        txtTenMon.Clear();
-                        txtGia.Clear();
-                        LoadData();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Lỗi khi xóa: " + ex.Message);
-                    }
-                }
+                MessageBox.Show("Vui lòng click chọn món cần xóa trên bảng dữ liệu!");
+                return;
             }
+
+            conn = new SqlConnection("Data Source=LAPTOP-I6EBBTME;Initial Catalog=QLQTraSua;User ID=sa;Password=Duy200666.");
+            conn.Open();
+
+            string sql = "DELETE from MonChinh WHERE MaMon=" + maDangChon;
+
+            SqlCommand cmd = new SqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
+
+            MessageBox.Show("Deleted");
+            conn.Close();
+
+            maDangChon = -1;
+            txtTenMon.Clear();
+            txtGia.Clear();
+            LoadData();
+        }
+
+        // Nhấn nút Reload - Làm mới lại toàn bộ danh sách bản ghi
+        private void btnReload_Click(object sender, EventArgs e)
+        {
+            LoadData();
         }
     }
 }
